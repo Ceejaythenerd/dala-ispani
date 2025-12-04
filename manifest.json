@@ -1,0 +1,21 @@
+{
+    "name": "Dala Ispani",
+    "short_name": "Dala Ispani",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#fffef0",
+    "theme_color": "#000080",
+    "description": "Your cheat sheet to finding jobs, learnerships, and internships in Mzansi.",
+    "icons": [
+        {
+            "src": "https://cdn-icons-png.flaticon.com/512/2280/2280532.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://cdn-icons-png.flaticon.com/512/2280/2280532.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

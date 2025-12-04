@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dala Ispani - Sketch Your Future</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Handwritten fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Patrick+Hand&display=swap"
+        rel="stylesheet">
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000080">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2280/2280532.png">
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:title" content="Dala Ispani - Sketch Your Future">
+    <meta property="og:description"
+        content="Your cheat sheet to finding jobs, learnerships, and internships in Mzansi. No more stress, just success.">
+    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/2280/2280532.png">
+    <meta property="og:url" content="https://dalaispani.co.za">
+    <meta property="og:type" content="website">
+
+    <style>
+        :root {
+            --ink-blue: #000080;
+            --pencil-gray: #555;
+            --paper-line: #a2c2e0;
+            --paper-bg: #fffef0;
+            --highlighter: rgba(255, 255, 0, 0.4);
+            --red-pen: #d93025;
+        }
+
+        body {
+            font-family: 'Patrick Hand', cursive;
+            background-color: var(--paper-bg);
+            color: var(--ink-blue);
+            font-size: 1.25rem;
+            /* Lined Paper Pattern */
+            background-image: linear-gradient(var(--paper-line) 1px, transparent 1px);
+            background-size: 100% 2rem;
+            background-attachment: local;
+            line-height: 2rem;
+            /* Matches grid size */
+        }
+
+        /* Vertical margin line */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 2rem;
+            /* Mobile margin */
+            bottom: 0;
+            width: 2px;
+            background-color: rgba(255, 0, 0, 0.3);
+            z-index: -1;
+        }
+
+        @media (min-width: 768px) {
+            body::before {
+                left: 15%;
+                /* Desktop margin */
+            }
+        }
+
+        h1,
+        h2,
+        h3,
+        .sketch-title {
+            font-family: 'Amatic SC', cursive;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        /* Sketchy Box */
+        .sketch-card {
+            background: white;
+            border: 2px solid var(--ink-blue);
+            border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px;
+            /* Rough edges */
+            box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .sketch-card:hover {
+            transform: rotate(-1deg) scale(1.01);
+            box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.15);
+        }
+
+        /* Scribble Button */
+        .btn-doodle {
+            background: transparent;
+            border: 3px solid var(--ink-blue);
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+            color: var(--ink-blue);
+            padding: 10px 30px;
+            font-family: 'Amatic SC', cursive;
+            font-size: 1.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn-doodle:hover {
+            background: var(--ink-blue);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Highlighter Effect */
+        .highlight {
+            background: linear-gradient(120deg, var(--highlighter) 0%, var(--highlighter) 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 45%;
+            background-position: 0 80%;
+            transition: background-size 0.2s ease-in;
+        }
+
+        .sketch-card:hover .highlight {
+            background-size: 100% 85%;
+        }
+
+        /* Sticky Note */
+        .sticky-note {
+            background-color: #ffeba7;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+            transform: rotate(-2deg);
+            position: relative;
+        }
+
+        .sticky-note::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 20%);
+        }
+
+        /* Navigation */
+        .nav-item.active {
+            text-decoration: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: var(--red-pen);
+            text-decoration-thickness: 2px;
+        }
+
+        /* Page Transition */
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+            animation: roughFade 0.4s ease-out;
+        }
+
+        @keyframes roughFade {
+            0% {
+                opacity: 0;
+                transform: translateY(10px) rotate(1deg);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) rotate(0);
+            }
+        }
+
+        /* Input styling */
+        .sketch-input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px dashed var(--ink-blue);
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1.5rem;
+        }
+
+        .sketch-input:focus {
+            outline: none;
+            border-bottom: 3px solid var(--red-pen);
+        }
+
+        /* MODAL STYLES */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        .paper-modal {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            /* Lined paper effect inside modal */
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 100% 2rem;
+            line-height: 2rem;
+            border: 2px solid #333;
+            /* Torn paper edge effect */
+            clip-path: polygon(0% 0%, 100% 0%, 100% 98%, 98% 100%, 95% 98%, 92% 100%, 89% 98%, 86% 100%, 83% 98%, 80% 100%, 77% 98%, 74% 100%, 71% 98%, 68% 100%, 65% 98%, 62% 100%, 59% 98%, 56% 100%, 53% 98%, 50% 100%, 47% 98%, 44% 100%, 41% 98%, 38% 100%, 35% 98%, 32% 100%, 29% 98%, 26% 100%, 23% 98%, 20% 100%, 17% 98%, 14% 100%, 11% 98%, 8% 100%, 5% 98%, 2% 100%, 0% 98%);
+            padding: 2rem;
+            padding-bottom: 4rem;
+            box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.2);
+            transform: rotate(1deg);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            color: var(--red-pen);
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        /* Filter Pills */
+        .filter-pill {
+            border: 2px solid var(--ink-blue);
+            border-radius: 20px;
+            padding: 0.25rem 1rem;
+            font-family: 'Amatic SC', cursive;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+        }
+
+        .filter-pill:hover,
+        .filter-pill.active {
+            background: var(--ink-blue);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Heart Icon Animation */
+        .save-btn {
+            z-index: 10;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .save-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .save-btn.saved i {
+            font-weight: 900;
+            color: var(--red-pen);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    <!-- JOB INFO MODAL -->
+    <div id="job-modal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="paper-modal" onclick="event.stopPropagation()">
+            <button class="close-modal" onclick="closeModal(event)"><i class="fas fa-times"></i></button>
+            <div id="modal-content"></div>
+            <div class="mt-8 flex flex-col sm:flex-row justify-end gap-4 border-t-2 border-dashed border-gray-300 pt-4">
+                <a id="modal-share-btn" href="#" target="_blank"
+                    class="flex items-center justify-center gap-2 text-green-600 font-bold border-2 border-green-600 rounded-full px-4 py-1 hover:bg-green-50 transition transform hover:-rotate-1">
+                    <i class="fab fa-whatsapp text-xl"></i> Share
+                </a>
+                <a id="modal-apply-btn" href="#" target="_blank"
+                    class="btn-doodle text-sm py-2 px-6 no-underline text-center">
+                    Apply Now <i class="fas fa-external-link-alt ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHEAT SHEET MODAL -->
+    <div id="cheat-sheet-modal" class="modal-overlay" onclick="closeCheatSheet(event)">
+        <div class="paper-modal bg-yellow-50" style="background-color: #fffde7;" onclick="event.stopPropagation()">
+            <button class="close-modal" onclick="closeCheatSheet(event)"><i class="fas fa-times"></i></button>
+            <div class="text-center mb-6">
+                <h2 class="text-5xl sketch-title highlight inline-block">CV Cheat Sheet</h2>
+                <p class="text-gray-500">Quick tips to get your CV noticed.</p>
+            </div>
+
+            <div class="space-y-6">
+                <div class="border-b-2 border-dashed border-gray-400 pb-4">
+                    <h3 class="text-2xl font-bold text-red-600 mb-2">1. The Golden Rule</h3>
+                    <p>Keep it to <strong>2 pages maximum</strong>. Recruiters spend about 6 seconds scanning a CV. Make
+                        it count.</p>
+                </div>
+                <div class="border-b-2 border-dashed border-gray-400 pb-4">
+                    <h3 class="text-2xl font-bold text-blue-600 mb-2">2. Contact Info</h3>
+                    <p>Use a professional email (e.g., name.surname@gmail.com). <strong>Do not</strong> use
+                        "sexyboy99@yahoo.com".</p>
+                </div>
+                <div class="border-b-2 border-dashed border-gray-400 pb-4">
+                    <h3 class="text-2xl font-bold text-green-600 mb-2">3. No Experience?</h3>
+                    <p>List your <strong>soft skills</strong> (Leadership, Teamwork, Communication) and any volunteer
+                        work or school projects.</p>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-purple-600 mb-2">4. File Format</h3>
+                    <p>Always save as <strong>PDF</strong> unless asked otherwise. Word docs can look messy on different
+                        phones.</p>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <button class="btn-doodle text-sm" onclick="closeCheatSheet(event)">Got it, Thanks!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Left Margin Doodle (Desktop) -->
+    <a href="#" target="_blank"
+        class="hidden md:flex flex-col items-center fixed bottom-10 left-4 w-[12%] z-20 opacity-90 rotate-[-2deg] hover:scale-105 transition-transform duration-300 cursor-pointer group-kota">
+        <svg viewBox="0 0 100 100"
+            class="w-24 h-24 text-gray-700 mb-2 filter drop-shadow-sm group-kota-hover:rotate-3 transition-transform"
+            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M25 45 L 75 45 L 75 85 Q 75 90 70 90 L 30 90 Q 25 90 25 85 Z" fill="#fff" />
+            <path d="M25 45 L 25 35 Q 50 15 75 35 L 75 45" fill="#fff" />
+            <path d="M35 45 L 32 25 L 38 45" fill="#fff" />
+            <path d="M45 45 L 48 20 L 52 45" fill="#fff" />
+            <path d="M60 45 L 65 28 L 68 45" fill="#fff" />
+            <path d="M50 45 C 50 40 70 40 70 45" />
+            <path d="M30 55 Q 50 65 70 50" stroke-dasharray="3 2" stroke-width="1.5" class="text-red-500"
+                stroke="currentColor" />
+            <ellipse cx="50" cy="95" rx="30" ry="3" class="fill-gray-300 stroke-none opacity-50" />
+        </svg>
+        <p
+            class="font-family-inherit text-sm text-center leading-tight text-gray-600 font-bold transform -rotate-1 group-kota-hover:text-red-600 transition-colors">
+            please buy us a <br>
+            <span class="text-red-600 bg-yellow-100 px-1 decoration-wavy underline decoration-red-400">kota</span> <br>
+            to keep the site <br>
+            alive 4 U
+            <i class="fas fa-heart text-red-500 text-xs ml-1 animate-pulse"></i>
+        </p>
+    </a>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-[#fffef0]/95 border-b-2 border-[#ccc] py-2 shadow-sm">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <a href="#home" class="cursor-pointer group flex items-center gap-3 block no-underline text-inherit">
+                <svg width="45" height="45" viewBox="0 0 100 100"
+                    class="text-[#000080] transform -rotate-6 group-hover:rotate-0 transition-transform duration-300"
+                    fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M50 25 C 40 25 40 10 50 10 C 60 10 60 25 50 25 Z" />
+                    <path d="M50 25 L 45 55" />
+                    <path d="M45 55 L 25 85" />
+                    <path d="M45 55 L 65 85" />
+                    <path d="M48 35 L 25 45" />
+                    <path d="M48 35 L 70 45" />
+                    <rect x="68" y="40" width="22" height="16" transform="rotate(-15 79 48)" fill="white" />
+                    <path d="M75 40 L 75 36 C 75 34 83 34 83 36 L 83 40" stroke-width="3"
+                        transform="rotate(-15 79 48)" />
+                </svg>
+                <div class="relative">
+                    <h1 class="text-4xl sketch-title">Dala Ispani<span
+                            class="text-3xl text-red-600 animate-pulse">.</span></h1>
+                </div>
+            </a>
+
+            <button class="md:hidden text-2xl" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="hidden md:flex gap-8 text-xl font-bold">
+                <a href="#home" id="nav-home" class="nav-item">Home</a>
+                <a href="#learnerships" id="nav-learnerships" class="nav-item">Learnerships</a>
+                <a href="#internships" id="nav-internships" class="nav-item">Internships</a>
+                <a href="#vacancies" id="nav-vacancies" class="nav-item">Vacancies</a>
+            </div>
+        </div>
+
+        <div id="mobile-menu"
+            class="hidden md:hidden absolute top-full left-0 w-full bg-[#fffef0] border-b-2 border-dashed border-gray-400 z-50 p-4 shadow-lg">
+            <a href="#home" class="block w-full text-left py-2 font-bold hover:text-red-600">Home</a>
+            <a href="#learnerships" class="block w-full text-left py-2 font-bold hover:text-red-600">Learnerships</a>
+            <a href="#internships" class="block w-full text-left py-2 font-bold hover:text-red-600">Internships</a>
+            <a href="#vacancies" class="block w-full text-left py-2 font-bold hover:text-red-600">Vacancies</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 md:pl-[15%] relative z-10">
+
+        <!-- HOME PAGE -->
+        <section id="home" class="page-section active">
+            <div class="flex flex-col md:flex-row items-center gap-12 mt-4 md:mt-12">
+                <div class="md:w-1/2 relative">
+                    <h1 class="text-6xl md:text-8xl sketch-title mb-2">Plan Your <br><span class="highlight">Big
+                            Moves.</span></h1>
+                    <p class="text-xl md:text-2xl mb-8 leading-loose text-gray-700">Hey there! 👋 <br>Dala Ispani is
+                        your cheat sheet to finding jobs, learnerships, and internships. No more stress, just success.
+                    </p>
+                    <div class="flex flex-wrap gap-4 items-center">
+                        <a href="#vacancies" class="btn-doodle inline-block">Find a Job</a>
+                        <span class="text-gray-500 transform -rotate-6">or...</span>
+                        <a href="#learnerships"
+                            class="text-xl font-bold underline decoration-wavy decoration-red-500 hover:text-red-600">Start
+                            Learning</a>
+                    </div>
+                </div>
+
+                <div class="md:w-1/2 flex justify-center relative">
+                    <div class="sticky-note w-64 h-64 p-6 flex flex-col justify-between transform rotate-3">
+                        <div class="text-center">
+                            <i
+                                class="fas fa-thumbtack text-red-500 absolute -top-3 left-1/2 transform -translate-x-1/2 text-xl shadow-sm"></i>
+                            <h3 class="sketch-title text-4xl mb-2">To Do List:</h3>
+                            <ul class="text-left list-none space-y-2 text-lg">
+                                <li><i class="far fa-check-square text-green-600"></i> Wake Up</li>
+                                <li><i class="far fa-check-square text-green-600"></i> Hustle</li>
+                                <li><i class="far fa-square"></i> <span class="font-bold">Get Hired!</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-16 grid md:grid-cols-3 gap-8">
+                <a href="#learnerships" class="sketch-card p-6 text-center block no-underline text-inherit">
+                    <i class="fas fa-pencil-alt text-4xl mb-2 text-gray-400"></i>
+                    <h3 class="sketch-title text-3xl">Learnerships</h3>
+                    <p>Study & get paid. <br> <span class="text-red-600 font-bold">(Matriculants!)</span></p>
+                </a>
+                <a href="#internships" class="sketch-card p-6 text-center block no-underline text-inherit">
+                    <i class="fas fa-briefcase text-4xl mb-2 text-gray-400"></i>
+                    <h3 class="sketch-title text-3xl">Internships</h3>
+                    <p>Get experience. <br>Build that CV.</p>
+                </a>
+                <a href="#vacancies" class="sketch-card p-6 text-center block no-underline text-inherit">
+                    <i class="fas fa-money-bill-wave text-4xl mb-2 text-gray-400"></i>
+                    <h3 class="sketch-title text-3xl">Jobs</h3>
+                    <p>Full time work. <br>Secure the bag.</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- LEARNERSHIPS PAGE (Dynamic) -->
+        <section id="learnerships" class="page-section">
+            <div class="mb-10 text-center">
+                <h2 class="sketch-title text-5xl">Skill Building 101</h2>
+                <div class="w-32 h-2 bg-yellow-200 mx-auto transform -rotate-1 rounded-full"></div>
+            </div>
+            <div id="learnerships-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </section>
+
+        <!-- INTERNSHIPS PAGE (Dynamic) -->
+        <section id="internships" class="page-section">
+            <div class="flex items-center gap-4 mb-8">
+                <i class="fas fa-paperclip text-4xl text-gray-400 transform rotate-45"></i>
+                <h2 class="sketch-title text-5xl">Recent Grads</h2>
+            </div>
+            <div id="internships-container" class="flex flex-col gap-6"></div>
+        </section>
+
+        <!-- VACANCIES PAGE (Dynamic) -->
+        <section id="vacancies" class="page-section">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-8">
+                <div>
+                    <h2 class="sketch-title text-6xl">Job Board</h2>
+                    <p class="text-gray-600">Permanent gigs. Real money.</p>
+                </div>
+                <div class="mt-4 md:mt-0 w-full md:w-auto relative">
+                    <input type="text" id="job-search" placeholder="Search (e.g. Driver)..."
+                        class="sketch-input w-full md:w-80 p-2" onkeyup="filterJobs()">
+                    <i class="fas fa-search absolute right-2 top-2 text-gray-400"></i>
+                </div>
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="flex flex-wrap gap-3 mb-8">
+                <button class="filter-pill active" onclick="filterCategory('All', this)">All</button>
+                <button class="filter-pill" onclick="filterCategory('Saved', this)"><i
+                        class="fas fa-heart text-red-500 mr-1"></i> Saved</button>
+                <button class="filter-pill" onclick="filterCategory('Retail', this)">Retail</button>
+                <button class="filter-pill" onclick="filterCategory('Logistics', this)">Logistics</button>
+                <button class="filter-pill" onclick="filterCategory('Admin', this)">Admin</button>
+                <button class="filter-pill" onclick="filterCategory('Tech', this)">Tech</button>
+            </div>
+
+            <div id="vacancies-container" class="grid md:grid-cols-2 gap-8"></div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto py-12 border-t-2 border-gray-300 relative z-10 bg-[#fffef0] overflow-hidden">
+        <div class="absolute right-0 bottom-0 w-full h-full pointer-events-none opacity-5">
+            <svg class="absolute right-0 bottom-0 w-64 h-64 text-blue-900" viewBox="0 0 200 200">
+                <path d="M10 100 Q 50 10 190 100 T 300 50" fill="none" stroke="currentColor" stroke-width="2" />
+                <path d="M0 150 Q 100 50 200 150" fill="none" stroke="currentColor" stroke-width="2" />
+            </svg>
+        </div>
+
+        <div class="container mx-auto px-4 md:pl-[15%] relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-center md:items-start gap-8">
+
+                <div class="text-center md:text-left flex flex-col items-center md:items-start">
+                    <a href="#home"
+                        class="cursor-pointer group flex items-center gap-3 mb-2 block no-underline text-inherit">
+                        <svg width="45" height="45" viewBox="0 0 100 100"
+                            class="text-[#000080] transform -rotate-6 group-hover:rotate-0 transition-transform duration-300"
+                            fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M50 25 C 40 25 40 10 50 10 C 60 10 60 25 50 25 Z" />
+                            <path d="M50 25 L 45 55" />
+                            <path d="M45 55 L 25 85" />
+                            <path d="M45 55 L 65 85" />
+                            <path d="M48 35 L 25 45" />
+                            <path d="M48 35 L 70 45" />
+                            <rect x="68" y="40" width="22" height="16" transform="rotate(-15 79 48)" fill="white" />
+                            <path d="M75 40 L 75 36 C 75 34 83 34 83 36 L 83 40" stroke-width="3"
+                                transform="rotate(-15 79 48)" />
+                        </svg>
+                        <div class="relative">
+                            <h2 class="text-4xl sketch-title">Dala Ispani<span
+                                    class="text-3xl text-red-600 animate-pulse">.</span></h2>
+                        </div>
+                    </a>
+                    <p class="text-sm text-gray-500">Made with <i class="fas fa-heart text-red-500"></i> in Mzansi.</p>
+                    <a href="mailto:hello@dalaispani.co.za"
+                        class="text-sm text-blue-600 hover:underline mt-2 block">Report a Problem / Contact Us</a>
+
+                    <!-- Disclaimer -->
+                    <p class="text-xs text-gray-400 mt-4 max-w-xs leading-tight">
+                        <strong>Disclaimer:</strong> Dala Ispani aggregates job opportunities. We are not a recruitment
+                        agency.
+                        Do not pay for any job. Report scams immediately.
+                    </p>
+                </div>
+
+                <!-- ATS CV Checker -->
+                <div class="relative inline-block group cursor-help select-none transform md:translate-y-2">
+                    <div
+                        class="flex items-center gap-3 border-2 border-dashed border-gray-400 p-3 rounded-lg bg-white transform -rotate-1 group-hover:rotate-0 transition shadow-sm">
+                        <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-robot text-gray-500 text-lg"></i>
+                        </div>
+                        <div class="text-left">
+                            <div class="font-bold text-gray-700 leading-none sketch-title text-xl">ATS CV Checker</div>
+                            <div class="text-xs text-gray-400 font-sans">Optimize your resume</div>
+                        </div>
+                    </div>
+                    <div
+                        class="absolute -top-3 -right-6 bg-yellow-300 text-red-600 text-xs font-bold px-2 py-1 transform rotate-12 shadow-md border border-yellow-400 font-sans">
+                        Coming Soon!</div>
+                </div>
+
+                <!-- CV Tips Button (Added Feature) -->
+                <div class="relative inline-block cursor-pointer transform md:translate-y-2" onclick="openCheatSheet()">
+                    <div
+                        class="flex items-center gap-3 border-2 border-solid border-blue-900 p-3 rounded-lg bg-yellow-100 transform rotate-1 hover:rotate-0 transition shadow-sm">
+                        <div
+                            class="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-blue-900">
+                            <i class="fas fa-lightbulb text-yellow-500 text-lg"></i>
+                        </div>
+                        <div class="text-left">
+                            <div class="font-bold text-blue-900 leading-none sketch-title text-xl">CV Cheat Sheet</div>
+                            <div class="text-xs text-blue-700 font-sans">Tips & Tricks</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Doodles -->
+                <div class="hidden lg:flex items-end gap-12 opacity-90">
+                    <div class="flex flex-col items-center group/doodle">
+                        <svg width="70" height="70" viewBox="0 0 100 100" fill="none" stroke="currentColor"
+                            stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+                            class="text-blue-900 mb-2 group-hover/doodle:scale-110 transition-transform">
+                            <circle cx="50" cy="30" r="15" />
+                            <path d="M50 45 L 50 70" />
+                            <path d="M50 70 L 30 90" />
+                            <path d="M50 70 L 70 90" />
+                            <path d="M50 50 L 35 45" />
+                            <path d="M50 50 L 65 45" />
+                            <path d="M30 40 L 70 40 L 70 55 L 30 55 Z" fill="white" stroke-width="2" />
+                        </svg>
+                        <span
+                            class="font-family-inherit text-sm text-gray-500 transform rotate-2 font-bold sketch-title text-xl">Learning...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- DATA STORE ---
+        const db = {
+            learnerships: [
+                { id: 1, title: "Motor Mechanic", category: "Trade", company: "AutoFix SA", location: "JHB", duration: "12 Months", stipend: "R4,500", description: "Learn vehicle servicing and engine diagnostics. Hands-on.", requirements: ["Grade 12 Maths/Science", "Passion for cars"], applyLink: "https://www.google.com/search?q=motor+mechanic+learnership", icon: "fa-tools", closingDate: "2025-12-31", reference: "MECH-001", postedDate: "2025-11-20" },
+                { id: 2, title: "Systems Dev", category: "Tech", company: "TechHouse", location: "CPT", duration: "18 Months", stipend: "R6,000", description: "Coding bootcamp. Java, C#, SQL. Laptop provided.", requirements: ["Matric", "Logic Pass"], applyLink: "https://www.google.com/search?q=systems+dev+learnership", icon: "fa-laptop", closingDate: "2026-01-15", reference: "DEV-2025", postedDate: "2025-11-25" },
+                { id: 3, title: "Business Admin", category: "Admin", company: "CorpServe", location: "DBN", duration: "12 Months", stipend: "R3,500", description: "Office admin skills. Filing, typing, switchboard.", requirements: ["Grade 11/12", "English communication"], applyLink: "https://www.google.com/search?q=business+admin+learnership", icon: "fa-user-tie", closingDate: "2025-12-20", reference: "ADMIN-KZN", postedDate: "2025-11-28" }
+            ],
+            internships: [
+                { id: 4, title: "Social Media Intern", category: "Tech", company: "Viral Marketing", location: "Remote", salary: "R8,000", description: "Create TikTok content and schedule posts.", requirements: ["Marketing Diploma", "Canva skills"], applyLink: "https://www.google.com/search?q=social+media+internship", index: 1, closingDate: "2025-12-15", reference: "SOC-MED", postedDate: "2025-12-01" },
+                { id: 5, title: "Finance Clerk", category: "Admin", company: "BlueBank", location: "Sandton", salary: "R12,000", description: "Reconciliations and data capturing.", requirements: ["BCom Accounting", "Excel"], applyLink: "https://www.google.com/search?q=finance+internship", index: 2, closingDate: "2026-02-28", reference: "FIN-002", postedDate: "2025-11-15" },
+                { id: 6, title: "Junior Designer", category: "Tech", company: "Art Studio", location: "Cape Town", salary: "R7,000", description: "Create logos and web assets.", requirements: ["Graphic Design Qual", "Portfolio"], applyLink: "https://www.google.com/search?q=design+internship", index: 3, closingDate: "2025-12-10", reference: "DES-CPT", postedDate: "2025-11-30" }
+            ],
+            vacancies: [
+                { id: 7, title: "Store Manager", category: "Retail", company: "FashionRetail", location: "Sandton", salary: "R18,000", type: "Full Time", description: "Lead flagship store. Staff KPIs and stock.", requirements: ["2y Retail Mgmt", "Leadership"], applyLink: "https://www.google.com/search?q=store+manager+jobs", icon: "fa-star", color: "yellow-100", closingDate: "2026-01-30", reference: "MGR-SANDTON", postedDate: "2025-11-10" },
+                { id: 8, title: "Driver (Code 10)", category: "Logistics", company: "LogisticsPro", location: "Pretoria", salary: "R12,000", type: "Contract", description: "Daily deliveries. Gauteng area.", requirements: ["Valid PDP", "Clean Record"], applyLink: "https://www.google.com/search?q=driver+jobs", icon: "fa-car", color: "blue-100", closingDate: "Urgent", reference: "DRV-PTA", postedDate: "2025-12-02" },
+                { id: 9, title: "Receptionist", category: "Admin", company: "LawFirm Inc", location: "Durban", salary: "R8,500", type: "Full Time", description: "Front desk professional.", requirements: ["Matric", "Computer Literate"], applyLink: "https://www.google.com/search?q=receptionist+jobs", icon: "fa-phone", color: "pink-100", closingDate: "2025-12-24", reference: "REC-DBN", postedDate: "2025-11-29" }
+            ]
+        };
+
+        // --- SAVED JOBS LOGIC ---
+        function getSavedJobs() {
+            return JSON.parse(localStorage.getItem('savedJobs')) || [];
+        }
+
+        function toggleSave(e, id) {
+            e.stopPropagation();
+            let saved = getSavedJobs();
+            if (saved.includes(id)) {
+                saved = saved.filter(jobId => jobId !== id);
+            } else {
+                saved.push(id);
+            }
+            localStorage.setItem('savedJobs', JSON.stringify(saved));
+
+            // Re-render to show updated heart state
+            const currentFilter = document.querySelector('.filter-pill.active').textContent.trim();
+            if (currentFilter === 'Saved') {
+                filterCategory('Saved', document.querySelector('.filter-pill.active'));
+            } else {
+                renderVacancies(document.getElementById('job-search').value);
+            }
+        }
+
+        // --- HELPER: DATE FORMATTER ---
+        function formatDate(dateStr) {
+            if (dateStr === 'Urgent') return '<span class="text-red-600 font-bold animate-pulse">Urgent!</span>';
+            return dateStr;
+        }
+
+        // --- RENDER FUNCTIONS ---
+
+        function renderLearnerships() {
+            const container = document.getElementById('learnerships-container');
+            container.innerHTML = db.learnerships.map(job => `
+                <button class="sketch-card p-0 flex flex-col group text-left w-full" onclick="openModal('learnerships', ${job.id})">
+                    <div class="h-32 bg-gray-100 border-b-2 border-dashed border-gray-400 flex items-center justify-center relative overflow-hidden w-full">
+                        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(black 1px, transparent 1px); background-size: 5px 5px;"></div>
+                        <i class="fas ${job.icon} text-5xl text-gray-600 group-hover:scale-110 transition"></i>
+                    </div>
+                    <div class="p-6 w-full">
+                        <h3 class="sketch-title text-3xl mb-1">${job.title}</h3>
+                        <p class="text-sm text-gray-500 mb-2">${job.duration} • ${job.location}</p>
+                        <p class="text-xs text-gray-400 mb-4">Ref: ${job.reference}</p>
+                        <p class="mb-6 text-lg truncate line-clamp-2">${job.description}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="bg-yellow-200 px-2 transform -rotate-2 text-sm font-bold">${job.stipend}</span>
+                            <span class="text-xs text-red-500 font-bold">Closes: ${formatDate(job.closingDate)}</span>
+                        </div>
+                    </div>
+                </button>
+            `).join('');
+        }
+
+        function renderInternships() {
+            const container = document.getElementById('internships-container');
+            container.innerHTML = db.internships.map(job => `
+                <button class="sketch-card p-6 flex flex-col md:flex-row items-center gap-6 group cursor-pointer text-left w-full" onclick="openModal('internships', ${job.id})">
+                    <div class="w-16 h-16 border-2 border-gray-800 rounded-full flex items-center justify-center text-2xl font-bold bg-white group-hover:bg-yellow-100 flex-shrink-0">
+                        ${job.index}
+                    </div>
+                    <div class="flex-grow text-center md:text-left">
+                        <h3 class="text-2xl font-bold group-hover:text-red-600 transition">${job.title}</h3>
+                        <p class="text-gray-500">${job.company} • ${job.location}</p>
+                        <p class="text-xs text-gray-400 mt-1">Ref: ${job.reference} | Posted: ${job.postedDate}</p>
+                    </div>
+                    <div class="md:text-right flex flex-col items-center md:items-end">
+                        <div class="text-3xl sketch-title mb-1">${job.salary}</div>
+                        <span class="text-xs text-red-500 font-bold">Closes: ${formatDate(job.closingDate)}</span>
+                    </div>
+                </button>
+            `).join('');
+        }
+
+        let currentCategory = 'All';
+
+        function renderVacancies(filterText = "") {
+            const container = document.getElementById('vacancies-container');
+            const savedJobs = getSavedJobs();
+
+            const filtered = db.vacancies.filter(job => {
+                // Text Filter
+                const matchesText = job.title.toLowerCase().includes(filterText.toLowerCase()) ||
+                    job.company.toLowerCase().includes(filterText.toLowerCase());
+
+                // Category Filter
+                let matchesCategory = false;
+                if (currentCategory === 'All') matchesCategory = true;
+                else if (currentCategory === 'Saved') matchesCategory = savedJobs.includes(job.id);
+                else matchesCategory = job.category === currentCategory;
+
+                return matchesText && matchesCategory;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-2 text-center text-gray-500 text-xl font-bold p-10 transform rotate-1">No jobs found here... keep hustling! 🧐</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(job => {
+                let colorClass = '';
+                let style = '';
+                if (job.color === 'blue-100') { colorClass = 'bg-blue-100'; style = 'background-color: #dbeafe;'; }
+                else if (job.color === 'pink-100') { colorClass = 'bg-pink-100'; style = 'background-color: #fce7f3;'; }
+
+                const isSaved = savedJobs.includes(job.id);
+                const heartClass = isSaved ? 'fas fa-heart text-red-600' : 'far fa-heart text-gray-400';
+
+                return `
+                <button class="sticky-note p-8 flex flex-col transform ${Math.random() > 0.5 ? 'rotate-1' : '-rotate-1'} hover:rotate-0 transition duration-300 cursor-pointer ${colorClass} text-left w-full" style="${style}" onclick="openModal('vacancies', ${job.id})">
+                    <div class="flex justify-between items-start mb-2 w-full">
+                        <h3 class="text-3xl sketch-title font-bold">${job.title}</h3>
+                        <div class="save-btn ${isSaved ? 'saved' : ''}" onclick="toggleSave(event, ${job.id})">
+                            <i class="${heartClass} text-2xl"></i>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 font-bold mb-1">${job.company} • ${job.location}</p>
+                    <p class="text-xs text-gray-500 mb-4">Ref: ${job.reference}</p>
+                    <p class="text-lg leading-relaxed mb-6 line-clamp-3">
+                        ${job.description}
+                    </p>
+                    <div class="mt-auto border-t-2 border-dashed border-gray-400 pt-4 flex justify-between items-center w-full">
+                        <div class="flex flex-col">
+                            <span class="text-2xl font-bold">${job.salary}</span>
+                            <span class="text-xs text-red-500 font-bold">Closes: ${formatDate(job.closingDate)}</span>
+                        </div>
+                        <span class="bg-black text-white font-family-inherit px-4 py-2 rounded-sm transform hover:scale-105 transition text-sm">View</span>
+                    </div>
+                </button>
+            `}).join('');
+        }
+
+        function filterJobs() {
+            const text = document.getElementById('job-search').value;
+            renderVacancies(text);
+        }
+
+        function filterCategory(category, btnElement) {
+            currentCategory = category;
+            document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            renderVacancies(document.getElementById('job-search').value);
+        }
+
+        // --- MODAL LOGIC ---
+
+        function openModal(category, id) {
+            const job = db[category].find(j => j.id === id);
+            if (!job) return;
+
+            // Push state for mobile back button support
+            history.pushState({ modal: true }, null, window.location.hash);
+
+            const modalContent = document.getElementById('modal-content');
+            const applyBtn = document.getElementById('modal-apply-btn');
+            const shareBtn = document.getElementById('modal-share-btn');
+
+            applyBtn.href = job.applyLink;
+            const shareText = `Check out this ${job.title} opportunity at ${job.company} on Dala Ispani! Pays ${job.stipend || job.salary}. Ref: ${job.reference}`;
+            shareBtn.href = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+
+            let requirementsHtml = '';
+            if (job.requirements && job.requirements.length > 0) {
+                requirementsHtml = `<div class="mt-4 bg-yellow-50 p-4 border border-dashed border-gray-400 transform -rotate-1"><h4 class="font-bold sketch-title text-2xl mb-2">Requirements:</h4><ul class="list-disc pl-5">${job.requirements.map(req => `<li>${req}</li>`).join('')}</ul></div>`;
+            }
+
+            modalContent.innerHTML = `
+                <div class="text-center mb-6">
+                    <h2 class="text-5xl sketch-title mb-2 highlight inline-block">${job.title}</h2>
+                    <p class="text-xl text-gray-600">${job.company} | ${job.location}</p>
+                    <div class="flex justify-center gap-4 mt-2 text-sm text-gray-500">
+                        <span><strong>Ref:</strong> ${job.reference}</span>
+                        <span><strong>Posted:</strong> ${job.postedDate}</span>
+                    </div>
+                    <p class="text-sm text-red-500 font-bold mt-2">Closing Date: ${formatDate(job.closingDate)}</p>
+                </div>
+                <div class="text-lg leading-relaxed mb-6"><h3 class="text-3xl sketch-title mb-2">The Gist:</h3><p>${job.description}</p></div>
+                ${requirementsHtml}
+                <div class="mt-6 text-center"><span class="text-4xl sketch-title text-ink-blue">Pay: ${job.stipend || job.salary}</span></div>
+            `;
+            document.getElementById('job-modal').classList.add('open');
+        }
+
+        function closeModal(e) {
+            if (e) e.stopPropagation();
+            document.getElementById('job-modal').classList.remove('open');
+            // If we have history state, go back to remove the modal state
+            if (history.state && history.state.modal) {
+                history.back();
+            }
+        }
+
+        function openCheatSheet() {
+            history.pushState({ modal: true }, null, window.location.hash);
+            document.getElementById('cheat-sheet-modal').classList.add('open');
+        }
+
+        function closeCheatSheet(e) {
+            if (e) e.stopPropagation();
+            document.getElementById('cheat-sheet-modal').classList.remove('open');
+            if (history.state && history.state.modal) {
+                history.back();
+            }
+        }
+
+        // --- ROUTER & NAVIGATION ---
+
+        function handleHashChange() {
+            const hash = window.location.hash.slice(1) || 'home'; // Default to 'home'
+
+            // Update Navigation UI
+            document.querySelectorAll('.nav-item').forEach(link => link.classList.remove('active'));
+            const activeLink = document.getElementById(`nav-${hash}`);
+            if (activeLink) activeLink.classList.add('active');
+
+            // Update Page Visibility
+            document.querySelectorAll('.page-section').forEach(section => section.classList.remove('active'));
+            const activeSection = document.getElementById(hash);
+            if (activeSection) {
+                activeSection.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // Listen for back/forward button
+        window.addEventListener('hashchange', handleHashChange);
+
+        // Handle Mobile Back Button for Modals
+        window.addEventListener('popstate', (event) => {
+            // If we popped a state and it wasn't a modal state, ensure modals are closed
+            // (This is a simplified approach; for robust apps, check event.state)
+            if (!event.state || !event.state.modal) {
+                document.getElementById('job-modal').classList.remove('open');
+                document.getElementById('cheat-sheet-modal').classList.remove('open');
+            }
+        });
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial Load
+            if (!window.location.hash) {
+                window.location.hash = '#home';
+            } else {
+                handleHashChange();
+            }
+
+            renderLearnerships();
+            renderInternships();
+            renderVacancies();
+
+            // Register Service Worker for PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker Registered', reg))
+                    .catch(err => console.log('Service Worker Failed', err));
+            }
+        });
+    </script>
+</body>
+
+</html>
